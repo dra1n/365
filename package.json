@@ -1,7 +1,8 @@
 {
- "name":"af-node-base",
+ "name":"365-blog",
   "version":"0.0.1",
   "dependencies":{
-      "express": "latest"
+      "express": "latest",
+      "instagram-node-lib": "latest"
   }
 }
