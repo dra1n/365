@@ -1,5 +1,5 @@
 
-window.365 = {
+window.MyDay = {
   Models: {},
   Collections: {},
   Views: {},
@@ -10,5 +10,5 @@ window.365 = {
 };
 
 $(document).ready(function(){
-  365.init();
+  MyDay.init();
 });

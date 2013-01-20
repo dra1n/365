@@ -1,3 +1,3 @@
-365.Routers.ApplicationRouter = Backbone.Router.extend({
+MyDay.Routers.ApplicationRouter = Backbone.Router.extend({
 
 });

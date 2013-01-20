@@ -1,3 +1,3 @@
-365.Models.ApplicationModel = Backbone.Model.extend({
+MyDay.Models.ApplicationModel = Backbone.Model.extend({
 
 });
