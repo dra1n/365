@@ -2,8 +2,6 @@ var express = require('express')
   , fs = require('fs')
   , passport = require('passport')
   , http = require('http')
-  , path = require('path')
-  , util = require('util')
   , instagram = require('instagram-node-lib');
 
 // Load configurations
@@ -32,7 +30,6 @@ var app = express();
 app.configure(function() {
   app.set('dir', config.public_dir);
   app.set('port', process.env.PORT || 3000);
-  app.set('user_id', config.instagram.userId);   // Now works only for one user
 
   app.use(express.logger('dev'));
   app.use(express.cookieParser());
@@ -45,7 +42,7 @@ app.configure(function() {
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(app.router);
-  app.use(express.static(path.join(__dirname + config.public_dir)));
+  app.use(express.static(__dirname + config.public_dir));
 
   // We don't need this. Yet
   //app.engine('.html', function() {
