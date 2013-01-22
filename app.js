@@ -1,23 +1,38 @@
 var express = require('express')
+  , fs = require('fs')
   , passport = require('passport')
   , http = require('http')
   , path = require('path')
   , util = require('util')
-  , instagram = require('instagram-node-lib')
-  , InstagramStrategy = require('passport-instagram').Strategy;
+  , instagram = require('instagram-node-lib');
 
-instagram.set('client_id', process.env.CLIENT_ID);
-instagram.set('client_secret', process.env.CLIENT_SECRET);
-instagram.set('redirect_uri', process.env.REDIRECT_URI);
-instagram.set('access_token', process.env.ACCESS_TOKEN)
+// Load configurations
+var env = process.env.NODE_ENV || 'development'
+  , config = require('./config/config')[env]
+  , mongoose = require('mongoose');
+
+instagram.set('client_id', config.instagram.clientID);
+instagram.set('client_secret', config.instagram.clientSecret);
+instagram.set('access_token', config.instagram.accessToken);
+
+// Bootstrap db connection
+mongoose.connect('mongodb://localhost/test');
+
+// Bootstrap models
+var models_path = __dirname + '/models'
+fs.readdirSync(models_path).forEach(function (file) {
+  require(models_path+'/'+file);
+});
+
+// bootstrap passport config
+require('./config/passport')(passport, config);
 
 var app = express();
 
 app.configure(function() {
-  app.set('dir', '/public');
+  app.set('dir', config.public_dir);
   app.set('port', process.env.PORT || 3000);
-  app.set('user_id', process.env.USER_ID);   // Now works only for one user
-  app.set('callback_uri', 'http://365.eu01.aws.af.cm/auth/instagram/callback');
+  app.set('user_id', config.instagram.userId);   // Now works only for one user
 
   app.use(express.logger('dev'));
   app.use(express.cookieParser());
@@ -30,7 +45,7 @@ app.configure(function() {
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(app.router);
-  app.use(express.static(path.join(__dirname, 'public')));
+  app.use(express.static(path.join(__dirname + config.public_dir)));
 
   // We don't need this. Yet
   //app.engine('.html', function() {
@@ -44,50 +59,6 @@ app.configure(function() {
   //});
 });
 
-app.configure('development', function() {
-  console.log('Configuring middleware for the development environment.');
-  app.set('dir', '/app');
-  app.set('callback_uri', 'http://localhost:3000/auth/instagram/callback');
-  app.use(express.static(__dirname + '/app'));
-});
-
-// Passport session setup.
-//   To support persistent login sessions, Passport needs to be able to
-//   serialize users into and deserialize users out of the session.  Typically,
-//   this will be as simple as storing the user ID when serializing, and finding
-//   the user by ID when deserializing.  However, since this example does not
-//   have a database of user records, the complete Instagram profile is
-//   serialized and deserialized.
-passport.serializeUser(function(user, done) {
-  done(null, user);
-});
-
-passport.deserializeUser(function(obj, done) {
-  done(null, obj);
-});
-
-// Use the InstagramStrategy within Passport.
-//   Strategies in Passport require a `verify` function, which accept
-//   credentials (in this case, an accessToken, refreshToken, and Instagram
-//   profile), and invoke a callback with a user object.
-passport.use(new InstagramStrategy({
-    clientID: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: app.get('callback_uri')
-  },
-  function(accessToken, refreshToken, profile, done) {
-    // asynchronous verification, for effect...
-    process.nextTick(function () {
-
-      // To keep the example simple, the user's Instagram profile is returned to
-      // represent the logged-in user.  In a typical application, you would want
-      // to associate the Instagram account with a user record in your database,
-      // and return that user instead.
-      return done(null, profile);
-    });
-  }
-));
-
 //app.get('/', function(req, res) {
 //  res.sendfile(__dirname + app.get('dir') + '/index.html');
 //});
@@ -95,7 +66,7 @@ passport.use(new InstagramStrategy({
 app.get('/recent_media', function(req, res) {
   // TODO: maybe move credentials to separate object
   instagram.users.recent({
-    'user_id': app.get('user_id'),
+    'user_id': config.instagram.userId,
     'complete': function(data, pagination) {
       res.json(data);
     },

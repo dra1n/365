@@ -9,6 +9,7 @@
     "express": "latest",
     "instagram-node-lib": "latest",
     "passport-instagram": "latest",
-    "passport": "latest"
+    "passport": "latest",
+    "mongoose": "latest"
   }
 }
