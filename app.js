@@ -12,6 +12,7 @@ var env = process.env.NODE_ENV || 'development'
 instagram.set('client_id', config.instagram.clientID);
 instagram.set('client_secret', config.instagram.clientSecret);
 instagram.set('access_token', config.instagram.accessToken);
+instagram.set('callback_url', config.instagram.subCallbackUrl);
 
 // Bootstrap db connection
 mongoose.connect('mongodb://localhost/test');
@@ -101,10 +102,19 @@ app.get('/logout', function(req, res){
   res.redirect('/');
 });
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log("Express server listening on port " + app.get('port'));
+app.get('/api/subscription', function(req, res){
+  instagram.subscriptions.handshake(req, res);
 });
 
+app.post('/api/subscription', function(req, res){
+  console.log(req.body);
+  res.json(req.body);
+});
+
+http.createServer(app).listen(app.get('port'), function() {
+  console.log("Express server listening on port " + app.get('port'));
+  instagram.users.subscribe({});
+});
 
 // Simple route middleware to ensure user is authenticated.
 //   Use this route middleware on any resource that needs to be protected.  If
