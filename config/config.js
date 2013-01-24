@@ -4,8 +4,8 @@ module.exports = {
       , instagram: {
           clientID: process.env.CLIENT_ID
         , clientSecret: process.env.CLIENT_SECRET
-        , callbackURL: "http://4nhu.localtunnel.com/auth/instagram/callback"
-        , subCallbackUrl: "http://4nhu.localtunnel.com/api/subscription"
+        , callbackURL: "http://localhost:3000/auth/instagram/callback"
+        , subCallbackUrl: "http://localhost:3000/api/subscription"
         , accessToken: process.env.ACCESS_TOKEN
         , userId: process.env.USER_ID                                        // User feed. Maybe will remove later.
       }

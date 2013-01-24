@@ -57,59 +57,7 @@ app.configure(function() {
   //});
 });
 
-//app.get('/', function(req, res) {
-//  res.sendfile(__dirname + app.get('dir') + '/index.html');
-//});
-
-app.get('/recent_media', function(req, res) {
-  // TODO: maybe move credentials to separate object
-  instagram.users.recent({
-    'user_id': config.instagram.userId,
-    'complete': function(data, pagination) {
-      res.json(data);
-    },
-    'error': function(errorMessage, errorObject, caller) {
-      res.json(500, {'message': errorMessage, 'error': errorObject});
-    }
-  });
-});
-
-// GET /auth/instagram
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  The first step in Instagram authentication will involve
-//   redirecting the user to instagram.com.  After authorization, Instagram
-//   will redirect the user back to this application at /auth/instagram/callback
-app.get('/auth/instagram',
-  passport.authenticate('instagram'),
-  function(req, res){
-    // The request will be redirected to Instagram for authentication, so this
-    // function will not be called.
-  });
-
-// GET /auth/instagram/callback
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  If authentication fails, the user will be redirected back to the
-//   login page.  Otherwise, the primary route function function will be called,
-//   which, in this example, will redirect the user to the home page.
-app.get('/auth/instagram/callback', 
-  passport.authenticate('instagram'),
-  function(req, res) {
-    res.redirect('/');
-  });
-
-app.get('/logout', function(req, res){
-  req.logout();
-  res.redirect('/');
-});
-
-app.get('/api/subscription', function(req, res){
-  instagram.subscriptions.handshake(req, res);
-});
-
-app.post('/api/subscription', function(req, res){
-  console.log(req.body);
-  res.json(req.body);
-});
+require('./config/routes')(app, passport, instagram);
 
 http.createServer(app).listen(app.get('port'), function() {
   console.log("Express server listening on port " + app.get('port'));
@@ -121,6 +69,7 @@ http.createServer(app).listen(app.get('port'), function() {
 //   the request is authenticated (typically via a persistent login session),
 //   the request will proceed.  Otherwise, the user will be redirected to the
 //   login page.
+//   Move this to /config/middlewares/authorization
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
   res.redirect('/login');
