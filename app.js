@@ -15,7 +15,7 @@ instagram.set('access_token', config.instagram.accessToken);
 instagram.set('callback_url', config.instagram.subCallbackUrl);
 
 // Bootstrap db connection
-mongoose.connect('mongodb://localhost/test');
+mongoose.connect('mongodb://localhost/myday');
 
 // Bootstrap models
 var models_path = __dirname + '/models'
