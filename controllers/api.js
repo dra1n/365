@@ -23,7 +23,7 @@ module.exports = function(instagram) {
                       caption: data.caption.text
                     , images: data.images
                     , tags: data.tags
-                    , user_id: data.user.id
+                    , createdAt: Date.now()
                     , user: user
                   });
 
